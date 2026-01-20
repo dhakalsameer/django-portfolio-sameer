@@ -66,5 +66,5 @@ Django · Python · Backend Development · Web Application · Deployment · Rend
 
 **Sameer Dhakal**
 Backend Developer | Django
-📧 Email: [sameerdhakal1234@gmail.com](mailto:your-email@example.com)
-🔗 GitHub: [https://github.com/dhakalsameer](https://github.com/yourusername)
+📧 Email: [sameerdhakal1234@gmail.com](mailto:sameerdhakal1234@gmail.com)
+🔗 GitHub: [https://github.com/dhakalsameer](https://github.com/dhakalsameer)
