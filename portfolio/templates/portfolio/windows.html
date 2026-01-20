@@ -1,0 +1,599 @@
+{% load static %}
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ profile.full_name }} | {{ profile.title }}</title>
+
+    <!-- SEO -->
+    <meta name="description" content="{{ profile.bio|truncatechars:160 }}" />
+    <meta name="author" content="{{ profile.full_name }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@300;400;600&family=Fira+Code:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+    </style>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              inter: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+              fira: ["Fira Code", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        font-family: Inter, sans-serif;
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+      }
+
+      /* ========= THEMES ========= */
+      [data-theme="dark"] {
+        --bg: #020617;
+        --bg-soft: #020617;
+        --card: #0b1220;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --accent: #6366f1;
+      }
+      [data-theme="light"] {
+        --bg: #f8fafc;
+        --bg-soft: #ffffff;
+        --card: #ffffff;
+        --text: #020617;
+        --muted: #475569;
+        --accent: #4f46e5;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+      .accent {
+        color: var(--accent);
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        transition: transform 0.25s ease;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+      }
+
+      .fade-up {
+        opacity: 0;
+        transform: translateY(24px);
+        animation: fadeUp 0.9s ease forwards;
+      }
+      @keyframes fadeUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .img-fade {
+        transition: opacity 0.8s ease;
+      }
+      .hero-glow::before {
+        content: "";
+        position: absolute;
+        inset: -30%;
+        background: radial-gradient(circle, var(--accent), transparent 60%);
+        opacity: 0.15;
+        z-index: -1;
+      }
+
+      .cursor {
+        display: inline-block;
+        width: 1ch;
+        background-color: var(--accent);
+        animation: blink 1.2s infinite;
+      }
+      @keyframes blink {
+        0%,
+        50%,
+        100% {
+          opacity: 1;
+        }
+        25%,
+        75% {
+          opacity: 0;
+        }
+      }
+
+      #roleText {
+        font-weight: 600;
+        color: var(--accent);
+        text-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+      }
+
+      .project-live-btn,
+      .cert-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: 9999px;
+        border: 2px solid var(--accent);
+        background-color: rgba(99, 102, 241, 0.1);
+        color: var(--accent);
+        text-decoration: none;
+        transition: all 0.3s;
+      }
+      .project-live-btn:hover,
+      .cert-link:hover {
+        background-color: var(--accent);
+        color: #000;
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ================= NAVBAR ================= -->
+    <nav
+      class="fixed top-0 w-full z-50 backdrop-blur border-b border-black/10 dark:border-white/10"
+      style="background: var(--bg-soft)"
+    >
+      <div
+        class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center"
+      >
+        <span class="font-bold accent">{{ profile.full_name }}</span>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-4">
+          <a href="#home" class="hover:accent">Home</a>
+          <a href="#about-skills" class="hover:accent">About</a>
+          <a href="#projects" class="hover:accent">Projects</a>
+          <a href="#certifications" class="hover:accent">Certifications</a>
+          <a href="#contact" class="hover:accent">Contact</a>
+
+          <!-- Theme Toggle -->
+          <button
+            id="themeToggle"
+            class="border border-black/10 dark:border-white/20 px-3 py-1 rounded text-sm hover:border-[var(--accent)]"
+          >
+            Toggle
+          </button>
+
+          <!-- Linux ↔ Windows Switch -->
+          <button
+            id="pageSwitch"
+            class="border border-black/10 dark:border-white/20 px-3 py-1 rounded text-sm hover:border-[var(--accent)]"
+            title="Switch Linux ↔ Windows"
+          >
+            🐧
+          </button>
+        </div>
+
+        <!-- Mobile Hamburger -->
+        <button
+          id="menuToggle"
+          class="md:hidden text-lg border border-black/10 dark:border-white/20 px-3 py-1 rounded hover:border-[var(--accent)]"
+        >
+          ☰
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div
+        id="mobileMenu"
+        class="hidden flex-col gap-4 px-6 pb-6 bg-[var(--bg-soft)] md:hidden"
+      >
+        <a href="#home" class="hover:accent">Home</a>
+        <a href="#about-skills" class="hover:accent">About</a>
+        <a href="#projects" class="hover:accent">Projects</a>
+        <a href="#certifications" class="hover:accent">Certifications</a>
+        <a href="#contact" class="hover:accent">Contact</a>
+
+        <button
+          id="themeToggleMobile"
+          class="border border-black/10 dark:border-white/20 px-3 py-1 rounded text-sm hover:border-[var(--accent)]"
+        >
+          Toggle Theme
+        </button>
+        <button
+          id="pageSwitchMobile"
+          class="border border-black/10 dark:border-white/20 px-3 py-1 rounded text-sm hover:border-[var(--accent)]"
+          title="Switch Linux ↔ Windows"
+        >
+          🐧
+        </button>
+      </div>
+    </nav>
+
+    <section
+      id="home"
+      class="min-h-screen flex flex-col-reverse md:flex-row items-center pt-32 relative overflow-hidden"
+    >
+      <div class="hero-glow absolute inset-0"></div>
+      <div
+        class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-14 items-center"
+      >
+        <!-- TEXT -->
+        <div class="space-y-6 text-center md:text-left">
+          <h1 class="text-4xl md:text-6xl font-bold fade-up">
+            Hi, I’m
+            <span class="block mt-2 accent">{{ profile.full_name }}</span>
+          </h1>
+          <p class="text-xl md:text-2xl muted fade-up">
+            <span
+              id="roleText"
+              data-roles='[{% for role in roles %}"{{ role.title }}"{% if not forloop.last %},{% endif %}{% endfor %}]'
+            ></span>
+          </p>
+          <p class="max-w-xl muted fade-up mx-auto md:mx-0">
+            {{ profile.bio }}
+          </p>
+          <div
+            class="flex flex-col sm:flex-row justify-center md:justify-start gap-4 fade-up"
+          >
+            <a
+              href="#projects"
+              class="bg-[var(--accent)] text-white px-7 py-3 rounded-xl font-medium hover:scale-105 transition text-center"
+              >View Projects</a
+            >
+            <a
+              href="{{ profile.resume.url }}"
+              download
+              class="border border-[var(--accent)] px-7 py-3 rounded-xl hover:bg-[var(--accent)] hover:text-white transition text-center"
+              >Resume</a
+            >
+          </div>
+        </div>
+
+        <!-- IMAGE -->
+        <div class="flex justify-center md:justify-end fade-up mb-8 md:mb-0">
+          <div class="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80">
+            {% for photo in photos %}
+            <img
+              src="{{ photo.image.url }}"
+              class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-xl img-fade {% if forloop.first %}opacity-100{% else %}opacity-0{% endif %}"
+            />
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ABOUT + SKILLS ================= -->
+    <section
+      id="about-skills"
+      class="py-24 border-t border-black/10 dark:border-white/10"
+    >
+      <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12">
+        <div>
+          <h2 class="text-3xl font-semibold mb-6">About Me</h2>
+          <p class="muted leading-relaxed">{{ profile.about }}</p>
+        </div>
+        <div>
+          <h2 class="text-3xl font-semibold mb-6">Skills</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {% for skill in skills %}
+            <div class="card p-4 text-center font-medium">{{ skill.name }}</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PROJECTS ================= -->
+    <section id="projects" class="py-24 bg-black/5 dark:bg-white/5">
+      <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-3xl font-semibold mb-12 text-center">Projects</h2>
+        <div class="grid md:grid-cols-2 gap-8">
+          {% for project in projects %}
+          <div class="card overflow-hidden">
+            <img
+              src="{{ project.image.url }}"
+              class="w-full h-48 object-cover"
+            />
+            <div class="p-6">
+              <h3 class="text-xl md:text-2xl font-bold tracking-tight mb-2">
+                {{ project.title }}
+              </h3>
+              <div class="w-10 h-1 bg-[var(--accent)] rounded mb-3"></div>
+              <p class="muted mb-3">{{ project.description }}</p>
+              <p class="text-sm accent mb-4">{{ project.tech_stack }}</p>
+              <div class="flex flex-wrap gap-4">
+                <a
+                  href="{{ project.github_link }}"
+                  target="_blank"
+                  class="accent"
+                  >GitHub</a
+                >
+                {% if project.live_link %}
+                <a href="{{ project.live_link }}" target="_blank" class="accent"
+                  >Live</a
+                >
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CERTIFICATIONS ================= -->
+    <section
+      id="certifications"
+      class="py-24 border-t border-black/10 dark:border-white/10"
+    >
+      <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-3xl font-semibold mb-12 text-center">Certifications</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for cert in certifications %}
+          <div class="card p-6 group relative hover:shadow-lg transition">
+            {% if cert.image %}
+            <img
+              src="{{ cert.image.url }}"
+              alt="{{ cert.title }}"
+              class="w-full h-48 object-cover rounded-xl mb-4 clickable-img transition-transform duration-300 group-hover:scale-105"
+            />
+            {% endif %}
+            <h3 class="font-semibold text-lg mb-1">{{ cert.title }}</h3>
+            <p class="text-sm muted mb-2">{{ cert.organization }}</p>
+            <p class="text-xs muted mb-3">
+              Issued by: {{ cert.issuer }} | Date: {{ cert.date_awarded }}
+            </p>
+            {% if cert.certificate_url %}
+            <a
+              href="{{ cert.certificate_url }}"
+              target="_blank"
+              class="border border-[var(--accent)] px-4 py-2 rounded hover:bg-[var(--accent)] hover:text-white transition inline-block text-sm font-medium"
+              >View Certificate →</a
+            >
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CONTACT ================= -->
+    <section
+      id="contact"
+      class="py-24 border-t border-black/10 dark:border-white/10"
+    >
+      <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12">
+        <div
+          class="bg-[var(--card)] p-6 rounded-xl shadow-lg flex flex-col gap-4"
+        >
+          <h2 class="text-3xl font-semibold mb-4">Get in Touch</h2>
+          <p class="text-muted mb-2">Reach me via the following channels:</p>
+          <p class="text-gray-400">
+            Email:
+            <a
+              href="mailto:{{ profile.email }}"
+              class="underline accent hover:text-[var(--accent)]"
+              >{{ profile.email }}</a
+            >
+          </p>
+          {% if profile.linkedin %}
+          <p class="text-gray-400">
+            LinkedIn:
+            <a
+              href="{{ profile.linkedin }}"
+              target="_blank"
+              class="underline accent hover:text-[var(--accent)]"
+              >profile</a
+            >
+          </p>
+          {% endif %} {% if profile.github %}
+          <p class="text-gray-400">
+            GitHub:
+            <a
+              href="{{ profile.github }}"
+              target="_blank"
+              class="underline accent hover:text-[var(--accent)]"
+              >repo</a
+            >
+          </p>
+          {% endif %} {% if profile.facebook %}
+          <p class="text-gray-400">
+            Facebook:
+            <a
+              href="{{ profile.facebook }}"
+              target="_blank"
+              class="underline accent hover:text-[var(--accent)]"
+              >profile</a
+            >
+          </p>
+          {% endif %} {% if profile.twitter %}
+          <p class="text-gray-400">
+            Twitter:
+            <a
+              href="{{ profile.twitter }}"
+              target="_blank"
+              class="underline accent hover:text-[var(--accent)]"
+              >profile</a
+            >
+          </p>
+          {% endif %}
+        </div>
+
+        <div class="bg-[var(--card)] p-6 rounded-xl shadow-lg">
+          <h2 class="text-3xl font-semibold mb-4">Send Me a Message</h2>
+          <form
+            method="POST"
+            action="{% url 'contact_send_email' %}"
+            class="flex flex-col gap-4"
+          >
+            {% csrf_token %}
+            <input
+              type="text"
+              name="name"
+              placeholder="Your Name"
+              required
+              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              required
+              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+            />
+            <textarea
+              name="message"
+              placeholder="Your Message"
+              rows="5"
+              required
+              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+            ></textarea>
+            <button
+              type="submit"
+              class="bg-[var(--accent)] text-white px-6 py-3 rounded-lg font-medium hover:scale-105 transition-transform"
+            >
+              Send Message
+            </button>
+          </form>
+          {% if messages %}
+          <p class="mt-4 text-green-400 text-sm">
+            {% for message in messages %}{{ message }}{% endfor %}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <footer
+      class="py-8 text-center muted border-t border-black/10 dark:border-white/10"
+    >
+      © {{ now|date:"Y" }} {{ profile.full_name }}
+    </footer>
+
+    <!-- ================= SCRIPTS ================= -->
+
+    <script>
+      // Typing roles
+      (() => {
+        const el = document.getElementById("roleText");
+        if (!el) return;
+        const roles = JSON.parse(el.dataset.roles || "[]");
+        let i = 0,
+          j = 0,
+          del = false;
+        function loop() {
+          const w = roles[i];
+          el.textContent = del ? w.slice(0, --j) : w.slice(0, ++j);
+          if (!del && j === w.length) setTimeout(() => (del = true), 1200);
+          if (del && j === 0) {
+            del = false;
+            i = (i + 1) % roles.length;
+          }
+          setTimeout(loop, del ? 50 : 80);
+        }
+        loop();
+      })();
+
+      // Image rotation
+      (() => {
+        const imgs = document.querySelectorAll(".img-fade");
+        let i = 0;
+        if (imgs.length > 1)
+          setInterval(() => {
+            imgs[i].classList.replace("opacity-100", "opacity-0");
+            i = (i + 1) % imgs.length;
+            imgs[i].classList.replace("opacity-0", "opacity-100");
+          }, 4000);
+      })();
+
+      // Theme toggle (desktop & mobile)
+      const themeBtns = [
+        document.getElementById("themeToggle"),
+        document.getElementById("themeToggleMobile"),
+      ];
+      const root = document.documentElement;
+      const savedTheme = localStorage.getItem("theme") || "dark";
+      root.setAttribute("data-theme", savedTheme);
+      themeBtns.forEach((btn) =>
+        btn.addEventListener("click", () => {
+          const next =
+            root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+          root.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+        }),
+      );
+    </script>
+
+    <!-- linux -> windows -->
+
+    {{ is_linux|json_script:"isLinuxData" }}
+
+    <script>
+      const isLinux = JSON.parse(
+        document.getElementById("isLinuxData").textContent,
+      );
+
+      const pageSwitch = document.getElementById("pageSwitch");
+      const pageSwitchMobile = document.getElementById("pageSwitchMobile");
+
+      function updateSwitchIcon(btn) {
+        if (!btn) return;
+        btn.textContent = isLinux ? "🪟" : "🐧";
+      }
+
+      updateSwitchIcon(pageSwitch);
+      updateSwitchIcon(pageSwitchMobile);
+
+      function switchPage() {
+        window.location.href = isLinux
+          ? "{% url 'windows_home' %}"
+          : "{% url 'linux_home' %}";
+      }
+
+      pageSwitch?.addEventListener("click", switchPage);
+      pageSwitchMobile?.addEventListener("click", switchPage);
+    </script>
+  
+    <script>
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          const id = this.getAttribute("href");
+          if (id === "#") return; // ignore empty hash
+
+          e.preventDefault();
+          const target = document.querySelector(id);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
