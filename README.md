@@ -14,6 +14,9 @@ A dynamic personal portfolio built with **Django** featuring a unique **Linux & 
 
 ---
 
+![django-portfolio-sameer](https://raw.githubusercontent.com/dhakalsameer/django-portfolio-sameer/main/Screenshot from 2026-01-20 18-02-17.png)
+
+
 ## 🛠️ Tech Stack
 
 * **Backend:** Python, Django
