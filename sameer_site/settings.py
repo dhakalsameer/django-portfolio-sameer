@@ -125,6 +125,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 TEMPLATES[0]['DIRS'] = [BASE_DIR / "templates"]
 
+import os
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
